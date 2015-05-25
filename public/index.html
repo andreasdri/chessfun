@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="vendor/chessboard/dist/assets/chessboard.css">
     <link rel="stylesheet" href="vendor/skeleton-css/css/normalize.css">
     <link rel="stylesheet" href="vendor/skeleton-css/css/skeleton.css">
+    <link rel="stylesheet" href="css/main.css">
     <script src="vendor/jquery/dist/jquery.min.js"></script>
     <script src="vendor/json3/lib/json3.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
@@ -14,8 +15,11 @@
     <script src="js/chessgame.js"></script>
   </head>
   <body>
+  <div class="container">
+    <h1>ChessFun</h1>
     <div id="board" style="width: 400px"></div>
     <input type="text" placeholder="Your name" ref="name" autoFocus></input>
-    <button type="button">Find opponent</button>
+    <button id="button" type="button">Find opponent</button>
+  </div>
   </body>
 </html>

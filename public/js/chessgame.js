@@ -30,16 +30,20 @@ window.onload = function() {
 
   };
 
-  $("button").click(function() {
+  $('button').click(function() {
     username = $("input").val();
-    socket.emit('new game', username);
+    if(username && !game) {
+      socket.emit('new game', username);
+    }
   });
 
   socket.on('waiting', function() {
-    console.log('waiting for player');
+    $('#button').css('color', 'red').text('Waiting for opponent');
   });
 
   socket.on('game found', function(new_game) {
+    $('#button').css('color', 'green').text('Game found').prop('disabled', true);
+    $('input').prop('disabled', true);
     opponent = username === new_game.white.name ? new_game.black.name : new_game.white.name;
     var cfg = {
       draggable: true,
