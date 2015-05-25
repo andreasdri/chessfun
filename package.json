@@ -1,0 +1,22 @@
+{
+  "name": "chessfun",
+  "version": "0.1.0",
+  "main": "server/app.js",
+  "description": "Simple multiplayer chess",
+  "author": "Andreas Drivenes <andreas.drivenes@gmail.com>",
+  "dependencies": {
+    "express": "~4.0.0",
+    "body-parser": "~1.5.0",
+    "chess.js": "~0.9.0",
+    "socket.io": "~1.3.5"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "start": "node server/app.js"
+  },
+  "license": "MIT",
+  "private": true
+}

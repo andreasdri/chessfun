@@ -1,0 +1,15 @@
+{
+  "name": "chessfun",
+  "version": "0.1.0",
+  "homepage": "https://github.com/andybb/chessfun",
+  "authors": [
+    "Andreas Drivenes <andreas.drivenes@gmail.com>"
+  ],
+  "description": "Simple multiplayer chess",
+  "license": "MIT",
+  "dependencies": {
+    "chess.js": "~0.9.1",
+    "chessboard": "git@github.com:juangl/chessboard.git"
+  },
+  "private": true
+}
