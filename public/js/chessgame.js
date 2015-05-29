@@ -22,12 +22,15 @@ window.onload = function() {
       promotion: 'q' // NOTE: always promote to a queen for example simplicity
     });
 
-
     // illegal move
     if (move === null) return 'snapback';
-
     socket.emit('new move', move, opponent);
+  };
 
+   // update the board position after the piece snap
+  // for castling, en passant, pawn promotion
+  var onSnapEnd = function() {
+    board.position(game.fen());
   };
 
   $('button').click(function() {
