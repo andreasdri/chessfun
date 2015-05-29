@@ -53,7 +53,8 @@ window.onload = function() {
       orientation: username === new_game.white.name ? 'white' : 'black',
       position: 'start',
       onDrop: onDrop,
-      onDragStart: onDragStart
+      onDragStart: onDragStart,
+      onSnapEnd: onSnapEnd
     };
     game = new Chess();
     board = new Chessboard('board', cfg);
