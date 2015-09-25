@@ -1,7 +1,7 @@
 chessfun
 ======================
 
-A simple matchmaking multiplayer chess web app built with chess.js, chessboard.js, socket.io, Node and Express. Built for fun and learning purposes. Can be seen live [http://drivenes.net/chess](http://drivenes.net/chess).
+A simple matchmaking multiplayer chess web app built with chess.js, chessboard.js, socket.io, Node and Express. Built for fun and learning purposes. Can be seen live [http://chess.drivenes.net/](http://chess.drivenes.net/).
 
 #Setup
 
