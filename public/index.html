@@ -3,23 +3,30 @@
   <head>
     <title>Socket.IO chess</title>
     <meta charset="utf-8">
-    <link rel="stylesheet" href="vendor/chessboard/dist/assets/chessboard.css">
-    <link rel="stylesheet" href="vendor/skeleton-css/css/normalize.css">
-    <link rel="stylesheet" href="vendor/skeleton-css/css/skeleton.css">
-    <link rel="stylesheet" href="css/main.css">
-    <script src="vendor/jquery/dist/jquery.min.js"></script>
-    <script src="vendor/json3/lib/json3.min.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="vendor/chessboard/dist/chessboard.min.js"></script>
-    <script src="vendor/chess.js/chess.min.js"></script>
-    <script src="js/chessgame.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Skeleton CSS from node_modules -->
+    <link rel="stylesheet" href="/node_modules/skeleton-css/css/normalize.css">
+    <link rel="stylesheet" href="/node_modules/skeleton-css/css/skeleton.css">
+
+    <!-- cm-chessboard CSS -->
+    <link rel="stylesheet" href="/node_modules/cm-chessboard/assets/chessboard.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/main.css">
   </head>
   <body>
-  <div class="container">
-    <h1>ChessFun</h1>
-    <div id="board" style="width: 400px"></div>
-    <input type="text" placeholder="Your name" ref="name" autoFocus></input>
-    <button id="button" type="button">Find opponent</button>
-  </div>
+    <div class="container">
+      <h1>ChessFun</h1>
+      <div id="board" style="width: 400px"></div>
+      <input type="text" id="nameInput" placeholder="Your name" autofocus>
+      <button id="findButton" type="button">Find opponent</button>
+    </div>
+
+    <!-- Socket.IO client (auto-served by server) -->
+    <script src="/socket.io/socket.io.js"></script>
+
+    <!-- cm-chessboard (ES6 module) -->
+    <script type="module" src="/js/chessgame.js"></script>
   </body>
 </html>

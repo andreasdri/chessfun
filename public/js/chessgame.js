@@ -1,70 +1,126 @@
+import { Chessboard, COLOR, FEN, INPUT_EVENT_TYPE } from '../node_modules/cm-chessboard/src/Chessboard.js';
+import { Chess } from '../node_modules/chess.js/dist/esm/chess.js';
+
 window.onload = function() {
-  var socket = io();
-  var board;
-  var game;
-  var username;
-  var opponent;
+  const socket = io();
+  let board;
+  let game;
+  let username;
+  let opponent;
+  let myColor;
 
-    // do not pick up pieces if the game is over
-  // only pick up pieces for your color and if it is your turn
-  var onDragStart = function(source, piece, position, orientation) {
-    var color = orientation === "black" ? new RegExp("^w") : new RegExp("^b");
-    if (game.in_checkmate() === true || game.in_draw() === true || piece.search(color) !== -1 || game.turn() !== orientation.charAt(0)) {
-      return false;
+  // UI Elements
+  const nameInput = document.getElementById('nameInput');
+  const findButton = document.getElementById('findButton');
+
+  // cm-chessboard move input handler
+  function moveInputHandler(event) {
+    // Allow starting move input
+    if (event.type === INPUT_EVENT_TYPE.moveInputStarted) {
+      const piece = game.get(event.squareFrom);
+      if (!piece) return false;
+
+      const pieceColor = piece.color;
+      const playerColor = myColor === 'white' ? 'w' : 'b';
+
+      // Only allow moving own pieces on own turn
+      if (pieceColor !== playerColor || game.turn() !== playerColor) {
+        return false;
+      }
+
+      return true;
     }
-  };
 
-  var onDrop = function(source, target) {
-    // see if the move is legal
-    var move = game.move({
-      from: source,
-      to: target,
-      promotion: 'q' // NOTE: always promote to a queen for example simplicity
-    });
+    // Validate the move
+    if (event.type === INPUT_EVENT_TYPE.validateMoveInput) {
+      const move = game.move({
+        from: event.squareFrom,
+        to: event.squareTo,
+        promotion: 'q'
+      });
 
-    // illegal move
-    if (move === null) return 'snapback';
-    socket.emit('new move', move, opponent);
-  };
+      if (move === null) {
+        return false; // Invalid move
+      }
 
-   // update the board position after the piece snap
-  // for castling, en passant, pawn promotion
-  var onSnapEnd = function() {
-    board.position(game.fen());
-  };
+      // Move was valid, send to opponent
+      socket.emit('new move', {
+        from: event.squareFrom,
+        to: event.squareTo,
+        promotion: 'q'
+      }, opponent);
 
-  $('button').click(function() {
-    username = $("input").val();
-    if(username && !game) {
+      return true;
+    }
+
+    // After move is finished, update board position
+    if (event.type === INPUT_EVENT_TYPE.moveInputFinished) {
+      board.setPosition(game.fen(), true);
+    }
+  }
+
+  // Vanilla JS: Button click handler (was jQuery)
+  findButton.addEventListener('click', function() {
+    username = nameInput.value.trim();
+    if (username && !game) {
       socket.emit('new game', username);
     }
   });
 
+  // Socket.IO: Waiting for opponent
   socket.on('waiting', function() {
-    $('#button').css('color', 'red').text('Waiting for opponent');
+    findButton.style.color = 'red';
+    findButton.textContent = 'Waiting for opponent';
   });
 
+  // Socket.IO: Game found
   socket.on('game found', function(new_game) {
-    $('#button').css('color', 'green').text('Game found').prop('disabled', true);
-    $('input').prop('disabled', true);
-    opponent = username === new_game.white.name ? new_game.black.name : new_game.white.name;
-    var cfg = {
-      draggable: true,
-      orientation: username === new_game.white.name ? 'white' : 'black',
-      position: 'start',
-      onDrop: onDrop,
-      onDragStart: onDragStart,
-      onSnapEnd: onSnapEnd
-    };
-    game = new Chess();
-    board = new Chessboard('board', cfg);
+    findButton.style.color = 'green';
+    findButton.textContent = 'Game found';
+    findButton.disabled = true;
+    nameInput.disabled = true;
 
+    opponent = username === new_game.white.name
+      ? new_game.black.name
+      : new_game.white.name;
+
+    myColor = username === new_game.white.name ? 'white' : 'black';
+
+    game = new Chess();
+
+    board = new Chessboard(document.getElementById('board'), {
+      position: FEN.start,
+      orientation: myColor === 'white' ? COLOR.white : COLOR.black,
+      assetsUrl: '/node_modules/cm-chessboard/assets/',
+      style: {
+        cssClass: 'default',
+        showCoordinates: true,
+        aspectRatio: 1,
+        pieces: {
+          file: 'pieces/standard.svg'
+        }
+      },
+      responsive: true,
+      animationDuration: 300
+    });
+
+    board.enableMoveInput(moveInputHandler, myColor === 'white' ? COLOR.white : COLOR.black);
   });
 
+  // Socket.IO: Receive opponent's move
   socket.on('new move', function(move) {
     game.move(move);
-    board.position(game.fen());
+    board.setPosition(game.fen(), true);
   });
 
-
+  // Socket.IO: Player disconnected
+  socket.on('player disconnected', function() {
+    alert('Opponent disconnected!');
+    findButton.disabled = false;
+    findButton.textContent = 'Find opponent';
+    findButton.style.color = '';
+    nameInput.disabled = false;
+    game = null;
+    board.destroy();
+  });
 }

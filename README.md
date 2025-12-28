@@ -1,9 +1,14 @@
 chessfun
 ======================
 
-A simple matchmaking multiplayer chess web app built with chess.js, chessboard.js, socket.io, Node and Express. Built for fun and learning purposes. Can be seen live [http://chess.drivenes.net/](http://chess.drivenes.net/).
+A simple matchmaking multiplayer chess web app built with chess.js, cm-chessboard, Socket.IO, Node.js and Express. Built for fun and learning purposes. Can be seen live [http://chess.drivenes.net/](http://chess.drivenes.net/).
 
-#Setup
+# Setup
+
+**Requirements:**
+- Node.js >= 24.0.0
+
+**Installation:**
 
 Clone the repo with
 
@@ -12,14 +17,7 @@ Clone the repo with
 `cd` into the directory and run
 
     npm install
-    bower install
     npm start
 
-This might take some time. Now, the site should be available at `http://localhost:3000/`
+The site will be available at `http://localhost:3000/`
 
-
-#Todo
-- Integrate with Gulp
-- Prettier design (Bootstrap)
-- Clocks
-- Game over stuff

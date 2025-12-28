@@ -2,10 +2,16 @@ var express = require('express');
 var path = require('path');
 var app = express();
 var server = require('http').createServer(app);
-var io = require('socket.io')(server);
+var io = require('socket.io')(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
 var Chess = require('chess.js').Chess;
 
 app.use(express.static(path.join(__dirname, '../public')));
+app.use('/node_modules', express.static(path.join(__dirname, '../node_modules')));
 
 var queue = [];
 var games = [];
@@ -40,8 +46,14 @@ io.on('connection', function(socket){
         board: new Chess()
       };
       games.push(game);
-      io.to(opponent.socket.id).emit('game found', game);
-      io.to(socket.id).emit('game found', game);
+
+      // Send game info without the Chess board instance (which contains BigInt)
+      var gameInfo = {
+        white: game.white,
+        black: game.black
+      };
+      io.to(opponent.socket.id).emit('game found', gameInfo);
+      io.to(socket.id).emit('game found', gameInfo);
     }
 
   });
@@ -68,10 +80,10 @@ io.on('connection', function(socket){
         var black = game.black;
 
         if(white.id === socket.id) {
-          io.to(black).emit('player disconnected');
+          io.to(black.id).emit('player disconnected');
         }
         else if(black.id === socket.id) {
-          io.to(white).emit('player disconnected');
+          io.to(white.id).emit('player disconnected');
         }
       }
     }
