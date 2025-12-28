@@ -1,7 +1,12 @@
-import { Chessboard, COLOR, FEN, INPUT_EVENT_TYPE } from '../node_modules/cm-chessboard/src/Chessboard.js';
+import {
+  Chessboard,
+  COLOR,
+  FEN,
+  INPUT_EVENT_TYPE,
+} from '../node_modules/cm-chessboard/src/Chessboard.js';
 import { Chess } from '../node_modules/chess.js/dist/esm/chess.js';
 
-window.onload = function() {
+window.onload = function () {
   const socket = io();
   let board;
   let game;
@@ -9,13 +14,10 @@ window.onload = function() {
   let opponent;
   let myColor;
 
-  // UI Elements
   const nameInput = document.getElementById('nameInput');
   const findButton = document.getElementById('findButton');
 
-  // cm-chessboard move input handler
   function moveInputHandler(event) {
-    // Allow starting move input
     if (event.type === INPUT_EVENT_TYPE.moveInputStarted) {
       const piece = game.get(event.squareFrom);
       if (!piece) return false;
@@ -31,58 +33,57 @@ window.onload = function() {
       return true;
     }
 
-    // Validate the move
     if (event.type === INPUT_EVENT_TYPE.validateMoveInput) {
       const move = game.move({
         from: event.squareFrom,
         to: event.squareTo,
-        promotion: 'q'
+        promotion: 'q',
       });
 
       if (move === null) {
-        return false; // Invalid move
+        return false;
       }
 
-      // Move was valid, send to opponent
-      socket.emit('new move', {
-        from: event.squareFrom,
-        to: event.squareTo,
-        promotion: 'q'
-      }, opponent);
+      socket.emit(
+        'new move',
+        {
+          from: event.squareFrom,
+          to: event.squareTo,
+          promotion: 'q',
+        },
+        opponent
+      );
 
       return true;
     }
 
-    // After move is finished, update board position
     if (event.type === INPUT_EVENT_TYPE.moveInputFinished) {
       board.setPosition(game.fen(), true);
     }
   }
 
-  // Vanilla JS: Button click handler (was jQuery)
-  findButton.addEventListener('click', function() {
+  findButton.addEventListener('click', function () {
     username = nameInput.value.trim();
     if (username && !game) {
       socket.emit('new game', username);
     }
   });
 
-  // Socket.IO: Waiting for opponent
-  socket.on('waiting', function() {
+  socket.on('waiting', function () {
     findButton.style.color = 'red';
     findButton.textContent = 'Waiting for opponent';
   });
 
-  // Socket.IO: Game found
-  socket.on('game found', function(new_game) {
+  socket.on('game found', function (new_game) {
     findButton.style.color = 'green';
     findButton.textContent = 'Game found';
     findButton.disabled = true;
     nameInput.disabled = true;
 
-    opponent = username === new_game.white.name
-      ? new_game.black.name
-      : new_game.white.name;
+    opponent =
+      username === new_game.white.name
+        ? new_game.black.name
+        : new_game.white.name;
 
     myColor = username === new_game.white.name ? 'white' : 'black';
 
@@ -97,24 +98,25 @@ window.onload = function() {
         showCoordinates: true,
         aspectRatio: 1,
         pieces: {
-          file: 'pieces/standard.svg'
-        }
+          file: 'pieces/standard.svg',
+        },
       },
       responsive: true,
-      animationDuration: 300
+      animationDuration: 300,
     });
 
-    board.enableMoveInput(moveInputHandler, myColor === 'white' ? COLOR.white : COLOR.black);
+    board.enableMoveInput(
+      moveInputHandler,
+      myColor === 'white' ? COLOR.white : COLOR.black
+    );
   });
 
-  // Socket.IO: Receive opponent's move
-  socket.on('new move', function(move) {
+  socket.on('new move', function (move) {
     game.move(move);
     board.setPosition(game.fen(), true);
   });
 
-  // Socket.IO: Player disconnected
-  socket.on('player disconnected', function() {
+  socket.on('player disconnected', function () {
     alert('Opponent disconnected!');
     findButton.disabled = false;
     findButton.textContent = 'Find opponent';
@@ -123,4 +125,4 @@ window.onload = function() {
     game = null;
     board.destroy();
   });
-}
+};
